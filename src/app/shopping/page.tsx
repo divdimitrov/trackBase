@@ -14,16 +14,16 @@ function ShoppingItemRow({
   return (
     <button
       onClick={() => onToggle(item.id)}
-      className={`w-full flex items-center gap-3 p-4 min-h-[56px] rounded-xl border transition-all active:scale-[0.98] ${
+      className={`w-full flex items-center gap-3 p-4 min-h-[56px] rounded-2xl border transition-all active:scale-[0.98] ${
         item.checked
-          ? 'bg-gray-50 border-gray-200'
-          : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+          ? 'bg-gray-50/80 border-gray-200/60'
+          : 'bg-white border-gray-200/80 hover:border-gray-300 hover:shadow-sm'
       }`}
     >
       <div
-        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+        className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all ${
           item.checked
-            ? 'bg-green-500 border-green-500'
+            ? 'bg-green-500 border-green-500 shadow-sm shadow-green-200'
             : 'border-gray-300'
         }`}
       >
@@ -74,16 +74,16 @@ export default function ShoppingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900 mb-1">Shopping</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Shopping</h1>
         <p className="text-sm text-gray-500">
           {checkedCount} of {totalCount} items checked
         </p>
       </div>
 
       {/* Progress bar */}
-      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
         <div
-          className="h-full bg-green-500 transition-all duration-300"
+          className="h-full bg-green-500 rounded-full transition-all duration-500 ease-out"
           style={{ width: `${(checkedCount / totalCount) * 100}%` }}
         />
       </div>

@@ -3,7 +3,7 @@ import { Recipe } from '@/lib/types';
 
 function RecipeCard({ recipe }: { recipe: Recipe }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
       {recipe.media?.imageUrl && (
         <div className="aspect-video relative bg-gray-100">
           <img
@@ -22,19 +22,19 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
           )}
         </div>
       )}
-      <div className="p-4 space-y-3">
-        <h3 className="text-lg font-semibold text-gray-900">{recipe.title}</h3>
+      <div className="p-4 sm:p-5 space-y-3">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">{recipe.title}</h3>
         
         {recipe.notes && (
-          <p className="text-sm text-gray-600">{recipe.notes}</p>
+          <p className="text-sm text-gray-500 leading-relaxed">{recipe.notes}</p>
         )}
         
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Ingredients</h4>
-          <ul className="space-y-1">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Ingredients</h4>
+          <ul className="space-y-1.5">
             {recipe.ingredients.map((ingredient, index) => (
               <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                <span className="text-blue-500 mt-1">•</span>
+                <span className="text-gray-300 mt-0.5">•</span>
                 <span>{ingredient}</span>
               </li>
             ))}
@@ -49,7 +49,7 @@ export default function DietPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900 mb-1">Diet</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Diet</h1>
         <p className="text-sm text-gray-500">Your saved recipes and meal ideas</p>
       </div>
 

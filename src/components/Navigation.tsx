@@ -16,32 +16,32 @@ export default function Navigation() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm">
-      <div className="max-w-5xl mx-auto px-4">
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* App name / Logo */}
-          <Link href="/" className="flex items-center gap-2 text-gray-900">
+          <Link href="/" className="flex items-center gap-2.5 text-gray-900 group">
             <Image
               src="/trackbase-logo.png"
               alt="TrackBase logo"
-              width={32}
-              height={32}
+              width={36}
+              height={36}
               priority
-              className="rounded-md"
+              className="rounded-lg group-hover:scale-105 transition-transform"
             />
-            <span className="text-lg sm:text-xl font-semibold tracking-tight">TrackBase</span>
+            <span className="text-lg sm:text-xl font-bold tracking-tight">TrackBase</span>
           </Link>
 
           {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center gap-2">
+          <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-4 py-2 rounded-lg text-base font-medium transition-colors ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   pathname === item.href
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+                    ? 'bg-gray-900 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 {item.label}
@@ -52,12 +52,12 @@ export default function Navigation() {
           {/* Mobile hamburger button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg hover:bg-gray-100 transition-colors"
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors"
             aria-label="Toggle menu"
             aria-expanded={isOpen}
           >
             <svg
-              className="w-7 h-7 text-gray-700"
+              className="w-6 h-6 text-gray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -87,16 +87,16 @@ export default function Navigation() {
             isOpen ? 'max-h-96 pb-4' : 'max-h-0'
           }`}
         >
-          <div className="flex flex-col gap-2 pt-2">
+          <div className="flex flex-col gap-1 pt-2">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center px-4 py-3 min-h-[44px] rounded-lg text-lg font-medium transition-colors ${
+                className={`flex items-center px-4 py-3.5 min-h-[48px] rounded-xl text-base font-medium transition-all ${
                   pathname === item.href
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-gray-700 hover:bg-blue-50 active:bg-blue-100'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
                 }`}
               >
                 {item.label}

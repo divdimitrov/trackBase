@@ -28,16 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900 min-h-screen flex flex-col`}
       >
         <Navigation />
-        <main className="w-full max-w-5xl mx-auto px-4 py-6 flex-1">
+        <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1">
           {children}
         </main>
-        <footer className="border-t border-gray-200 bg-white">
-          <div className="w-full max-w-5xl mx-auto px-4 py-4 text-sm text-gray-500 flex items-center justify-between">
-            <span>© {year} TrackBase</span>
-            <span>v0.1.0</span>
+        <footer className="mt-auto border-t border-gray-200/80 bg-white/60 backdrop-blur">
+          <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
+            <span>© {year} TrackBase. All rights reserved.</span>
+            <span className="font-mono">v0.1.0</span>
           </div>
         </footer>
       </body>

@@ -30,17 +30,17 @@ export default function AdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900 mb-1">Admin</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Admin</h1>
         <p className="text-sm text-gray-500">Manage your tracker data and settings</p>
       </div>
 
       {/* Coming soon banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div className="bg-blue-50/80 border border-blue-200/60 rounded-2xl p-5">
         <div className="flex items-center gap-3">
           <span className="text-2xl">🚧</span>
           <div>
             <h2 className="font-semibold text-blue-900">Coming Soon</h2>
-            <p className="text-sm text-blue-700">
+            <p className="text-sm text-blue-700/80">
               Admin features are currently under development.
             </p>
           </div>
@@ -56,14 +56,14 @@ export default function AdminPage() {
           {adminSections.map((section) => (
             <div
               key={section.title}
-              className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 opacity-60"
+              className="flex items-center gap-4 p-4 sm:p-5 bg-white rounded-2xl border border-gray-200/60 opacity-50"
             >
               <span className="text-2xl">{section.icon}</span>
               <div className="flex-1">
                 <h3 className="font-medium text-gray-900">{section.title}</h3>
                 <p className="text-sm text-gray-500">{section.description}</p>
               </div>
-              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+              <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full font-medium">
                 Soon
               </span>
             </div>

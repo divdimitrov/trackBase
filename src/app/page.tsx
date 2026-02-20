@@ -1,42 +1,27 @@
-import Link from 'next/link';
+'use client';
 
-const sections = [
-  {
-    href: '/diet',
-    title: 'Diet',
-    description: 'Track your recipes and meals',
-    emoji: '🥗',
-  },
-  {
-    href: '/workouts',
-    title: 'Workouts',
-    description: 'Log your exercise sessions',
-    emoji: '💪',
-  },
-  {
-    href: '/shopping',
-    title: 'Shopping',
-    description: 'Manage your grocery list',
-    emoji: '🛒',
-  },
-  {
-    href: '/admin',
-    title: 'Admin',
-    description: 'Settings and configuration',
-    emoji: '⚙️',
-  },
-];
+import Link from 'next/link';
+import { useLanguage } from '@/components/LanguageProvider';
 
 export default function Home() {
+  const { t } = useLanguage();
+
+  const sections = [
+    { href: '/diet', title: t.home.dietTitle, description: t.home.dietDesc, emoji: '🥗' },
+    { href: '/workouts', title: t.home.workoutsTitle, description: t.home.workoutsDesc, emoji: '💪' },
+    { href: '/shopping', title: t.home.shoppingTitle, description: t.home.shoppingDesc, emoji: '🛒' },
+    { href: '/admin', title: t.home.adminTitle, description: t.home.adminDesc, emoji: '⚙️' },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Hero */}
       <section className="text-center pt-10 sm:pt-14 pb-4">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
-          Your personal tracker
+          {t.home.heroTitle}
         </h1>
         <p className="mt-2 text-base text-gray-500 max-w-md mx-auto">
-          Diet, workouts, and shopping — all in one place.
+          {t.home.heroSubtitle}
         </p>
       </section>
 

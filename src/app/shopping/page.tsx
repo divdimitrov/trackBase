@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { mockShoppingItems } from '@/lib/mockData';
 import { ShoppingItem } from '@/lib/types';
+import { useLanguage } from '@/components/LanguageProvider';
 
 function ShoppingItemRow({
   item,
@@ -71,12 +72,14 @@ export default function ShoppingPage() {
     return acc;
   }, {} as Record<string, ShoppingItem[]>);
 
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Shopping</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t.shopping.title}</h1>
         <p className="text-sm text-gray-500">
-          {checkedCount} of {totalCount} items checked
+          {t.shopping.subtitle.replace('{checked}', String(checkedCount)).replace('{total}', String(totalCount))}
         </p>
       </div>
 

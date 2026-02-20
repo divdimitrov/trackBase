@@ -4,16 +4,18 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-
-const navItems = [
-  { href: '/diet', label: 'Diet' },
-  { href: '/workouts', label: 'Workouts' },
-  { href: '/shopping', label: 'Shopping' },
-];
+import { useLanguage } from './LanguageProvider';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { locale, setLocale, t } = useLanguage();
+
+  const navItems = [
+    { href: '/diet', label: t.nav.diet },
+    { href: '/workouts', label: t.nav.workouts },
+    { href: '/shopping', label: t.nav.shopping },
+  ];
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
@@ -47,6 +49,14 @@ export default function Navigation() {
                 {item.label}
               </Link>
             ))}
+            {/* Language toggle */}
+            <button
+              onClick={() => setLocale(locale === 'en' ? 'bg' : 'en')}
+              className="ml-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              aria-label="Switch language"
+            >
+              {locale === 'en' ? '🇧🇬 BG' : '🇬🇧 EN'}
+            </button>
           </nav>
 
           {/* Mobile hamburger button */}
@@ -102,6 +112,13 @@ export default function Navigation() {
                 {item.label}
               </Link>
             ))}
+            {/* Mobile language toggle */}
+            <button
+              onClick={() => { setLocale(locale === 'en' ? 'bg' : 'en'); setIsOpen(false); }}
+              className="flex items-center px-4 py-3.5 min-h-[48px] rounded-xl text-base font-medium text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-all"
+            >
+              {locale === 'en' ? '🇧🇬 Български' : '🇬🇧 English'}
+            </button>
           </div>
         </nav>
       </div>

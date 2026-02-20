@@ -1,37 +1,23 @@
-const adminSections = [
-  {
-    title: 'Manage Recipes',
-    description: 'Add, edit, or delete recipes',
-    icon: '📝',
-  },
-  {
-    title: 'Manage Workouts',
-    description: 'Create workout templates and exercises',
-    icon: '🏋️',
-  },
-  {
-    title: 'Shopping Categories',
-    description: 'Organize your shopping list categories',
-    icon: '📂',
-  },
-  {
-    title: 'Data Export',
-    description: 'Export your data as JSON or CSV',
-    icon: '💾',
-  },
-  {
-    title: 'Settings',
-    description: 'App preferences and configuration',
-    icon: '⚙️',
-  },
-];
+'use client';
+
+import { useLanguage } from '@/components/LanguageProvider';
 
 export default function AdminPage() {
+  const { t } = useLanguage();
+
+  const adminSections = [
+    { title: t.admin.manageRecipes, description: t.admin.manageRecipesDesc, icon: '📝' },
+    { title: t.admin.manageWorkouts, description: t.admin.manageWorkoutsDesc, icon: '🏋️' },
+    { title: t.admin.shoppingCategories, description: t.admin.shoppingCategoriesDesc, icon: '📂' },
+    { title: t.admin.dataExport, description: t.admin.dataExportDesc, icon: '💾' },
+    { title: t.admin.settings, description: t.admin.settingsDesc, icon: '⚙️' },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Admin</h1>
-        <p className="text-sm text-gray-500">Manage your tracker data and settings</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{t.admin.title}</h1>
+        <p className="text-sm text-gray-500">{t.admin.subtitle}</p>
       </div>
 
       {/* Coming soon banner */}
@@ -39,9 +25,9 @@ export default function AdminPage() {
         <div className="flex items-center gap-3">
           <span className="text-2xl">🚧</span>
           <div>
-            <h2 className="font-semibold text-blue-900">Coming Soon</h2>
+            <h2 className="font-semibold text-blue-900">{t.admin.comingSoon}</h2>
             <p className="text-sm text-blue-700/80">
-              Admin features are currently under development.
+              {t.admin.comingSoonDesc}
             </p>
           </div>
         </div>
@@ -50,7 +36,7 @@ export default function AdminPage() {
       {/* Future admin sections */}
       <div className="space-y-3">
         <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-          Planned Features
+          {t.admin.plannedFeatures}
         </h2>
         <div className="space-y-2">
           {adminSections.map((section) => (
@@ -64,7 +50,7 @@ export default function AdminPage() {
                 <p className="text-sm text-gray-500">{section.description}</p>
               </div>
               <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full font-medium">
-                Soon
+                {t.admin.soon}
               </span>
             </div>
           ))}

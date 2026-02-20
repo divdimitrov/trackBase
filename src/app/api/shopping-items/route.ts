@@ -8,7 +8,7 @@ export async function GET(req: Request) {
 
   const supabase = supabaseServer();
   const { data, error } = await supabase
-    .from('recipes')
+    .from('shopping_items')
     .select('*')
     .order('created_at', { ascending: false });
 
@@ -20,14 +20,22 @@ export async function POST(req: Request) {
   const denied = requireApiKey(req);
   if (denied) return denied;
 
-  const [body, err] = await parseJson<{ title?: string; notes?: string }>(req);
+  const [body, err] = await parseJson<{
+    name?: string;
+    qty_text?: string;
+    is_checked?: boolean;
+  }>(req);
   if (err) return err;
-  if (!body!.title) return jsonError('title is required');
+  if (!body!.name) return jsonError('name is required');
 
   const supabase = supabaseServer();
   const { data, error } = await supabase
-    .from('recipes')
-    .insert({ title: body!.title, notes: body!.notes ?? null })
+    .from('shopping_items')
+    .insert({
+      name: body!.name,
+      qty_text: body!.qty_text ?? null,
+      is_checked: body!.is_checked ?? false,
+    })
     .select()
     .single();
 

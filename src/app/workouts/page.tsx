@@ -1,11 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider';
 import type { WorkoutSession, WorkoutSet, WorkoutSetMedia } from '@/lib/types';
 
 type SetWithMedia = WorkoutSet & { media: WorkoutSetMedia[] };
 type SessionWithSets = WorkoutSession & { sets: SetWithMedia[] };
+
+function getApiKey() {
+  return typeof window !== 'undefined' ? localStorage.getItem('trackbase_api_key') ?? '' : '';
+}
+
+function getHeaders(): Record<string, string> {
+  const k = getApiKey();
+  const h: Record<string, string> = { 'content-type': 'application/json' };
+  if (k) h['x-api-key'] = k;
+  return h;
+}
 
 /* ── Badge colours for exercise numbers ─────────────────────────────────── */
 const badgeColors = [
@@ -17,8 +28,87 @@ const badgeColors = [
   'bg-cyan-400 text-cyan-900',
 ];
 
-/* ── Single exercise card ───────────────────────────────────────────────── */
-function ExerciseCard({ set, index }: { set: SetWithMedia; index: number }) {
+/* ── Inline editable field ──────────────────────────────────────────────── */
+function InlineField({
+  value,
+  onSave,
+  label,
+  suffix,
+  className = '',
+  inputType = 'text',
+  placeholder,
+}: {
+  value: string;
+  onSave: (v: string) => void;
+  label: string;
+  suffix?: string;
+  className?: string;
+  inputType?: string;
+  placeholder?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const commit = () => {
+    setEditing(false);
+    if (draft !== value) onSave(draft);
+  };
+
+  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        type={inputType}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') { setDraft(value); setEditing(false); } }}
+        placeholder={placeholder}
+        className={`bg-white border border-blue-300 rounded-lg px-2 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 w-full ${className}`}
+        aria-label={label}
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className={`text-left rounded-lg px-2 py-1 text-sm font-medium hover:bg-blue-50 hover:text-blue-700 transition-colors cursor-text border border-transparent hover:border-blue-200 ${className}`}
+      title={`Click to edit ${label}`}
+    >
+      {value || <span className="text-gray-300">{placeholder ?? '—'}</span>}
+      {suffix && value && <span className="text-gray-400 ml-0.5">{suffix}</span>}
+    </button>
+  );
+}
+
+/* ── Save indicator ─────────────────────────────────────────────────────── */
+function SaveIndicator({ saving }: { saving: boolean }) {
+  if (!saving) return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-xs text-blue-500 animate-pulse">
+      <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> saving…
+    </span>
+  );
+}
+
+/* ── Single exercise card (editable) ────────────────────────────────────── */
+function ExerciseCard({
+  set,
+  index,
+  onUpdate,
+  saving,
+}: {
+  set: SetWithMedia;
+  index: number;
+  onUpdate: (setId: string, field: string, value: string) => void;
+  saving: boolean;
+}) {
   const badge = badgeColors[index % badgeColors.length];
   const images = set.media
     .map((m) => m.media)
@@ -31,7 +121,8 @@ function ExerciseCard({ set, index }: { set: SetWithMedia; index: number }) {
         <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-sm font-bold ${badge}`}>
           {index + 1}
         </span>
-        <h4 className="text-base font-semibold text-gray-900">{set.exercise}</h4>
+        <h4 className="text-base font-semibold text-gray-900 flex-1">{set.exercise}</h4>
+        <SaveIndicator saving={saving} />
       </div>
 
       {/* Reference images */}
@@ -48,17 +139,35 @@ function ExerciseCard({ set, index }: { set: SetWithMedia; index: number }) {
         </div>
       )}
 
-      {/* Series × reps + weight */}
-      <p className="text-sm text-gray-700">
-        {(set.series ?? 1) > 0 && set.reps
-          ? <>{set.series} × {set.reps}</>
-          : set.reps
-            ? <>{set.reps}</>
-            : null}
-        {set.weight != null && (
-          <span className="text-gray-500 ml-1">@ {set.weight} kg</span>
-        )}
-      </p>
+      {/* Editable: series × reps @ weight */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <InlineField
+          value={String(set.series ?? 1)}
+          onSave={(v) => onUpdate(set.id, 'series', v)}
+          label="Series"
+          inputType="number"
+          className="w-12 text-center"
+          placeholder="0"
+        />
+        <span className="text-gray-400 text-sm font-medium">×</span>
+        <InlineField
+          value={set.reps ?? ''}
+          onSave={(v) => onUpdate(set.id, 'reps', v)}
+          label="Reps"
+          className="w-16 text-center"
+          placeholder="reps"
+        />
+        <span className="text-gray-300 text-sm mx-1">@</span>
+        <InlineField
+          value={set.weight != null ? String(set.weight) : ''}
+          onSave={(v) => onUpdate(set.id, 'weight', v)}
+          label="Weight"
+          inputType="number"
+          className="w-16 text-center"
+          placeholder="kg"
+          suffix="kg"
+        />
+      </div>
 
       {/* Notes / instructions */}
       {set.notes && (
@@ -69,7 +178,17 @@ function ExerciseCard({ set, index }: { set: SetWithMedia; index: number }) {
 }
 
 /* ── Session / day card ─────────────────────────────────────────────────── */
-function SessionCard({ session, locale }: { session: SessionWithSets; locale: string }) {
+function SessionCard({
+  session,
+  locale,
+  onUpdate,
+  savingIds,
+}: {
+  session: SessionWithSets;
+  locale: string;
+  onUpdate: (setId: string, field: string, value: string) => void;
+  savingIds: Set<string>;
+}) {
   const formattedDate = session.workout_date
     ? new Date(session.workout_date + 'T00:00:00').toLocaleDateString(locale === 'bg' ? 'bg-BG' : 'en-US', {
         weekday: 'long',
@@ -106,7 +225,13 @@ function SessionCard({ session, locale }: { session: SessionWithSets; locale: st
           <p className="text-sm text-gray-400 italic text-center py-4">—</p>
         ) : (
           session.sets.map((set, i) => (
-            <ExerciseCard key={set.id} set={set} index={i} />
+            <ExerciseCard
+              key={set.id}
+              set={set}
+              index={i}
+              onUpdate={onUpdate}
+              saving={savingIds.has(set.id)}
+            />
           ))
         )}
       </div>
@@ -120,46 +245,73 @@ export default function WorkoutsPage() {
   const [sessions, setSessions] = useState<SessionWithSets[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const apiKey = typeof window !== 'undefined'
-          ? localStorage.getItem('trackbase_api_key') ?? ''
-          : '';
-        const headers: HeadersInit = apiKey ? { 'x-api-key': apiKey } : {};
+  const fetchData = useCallback(async () => {
+    try {
+      const headers = getHeaders();
+      const sessRes = await fetch('/api/workout-sessions?limit=100', { headers });
+      if (!sessRes.ok) throw new Error('sessions');
+      const sessData: WorkoutSession[] = await sessRes.json();
 
-        // 1. Fetch all sessions
-        const sessRes = await fetch('/api/workout-sessions?limit=100', { headers });
-        if (!sessRes.ok) throw new Error('sessions');
-        const sessData: WorkoutSession[] = await sessRes.json();
+      const withSets: SessionWithSets[] = await Promise.all(
+        sessData.map(async (s) => {
+          const setsRes = await fetch(`/api/workout-sessions/${s.id}/sets`, { headers });
+          const setsData: WorkoutSet[] = setsRes.ok ? await setsRes.json() : [];
+          const setsWithMedia: SetWithMedia[] = await Promise.all(
+            setsData.map(async (set) => {
+              const mRes = await fetch(`/api/workout-sets/${set.id}/media`, { headers });
+              const media: WorkoutSetMedia[] = mRes.ok ? await mRes.json() : [];
+              return { ...set, media };
+            }),
+          );
+          return { ...s, sets: setsWithMedia };
+        }),
+      );
 
-        // 2. Fetch exercises + media per session
-        const withSets: SessionWithSets[] = await Promise.all(
-          sessData.map(async (s) => {
-            const setsRes = await fetch(`/api/workout-sessions/${s.id}/sets`, { headers });
-            const setsData: WorkoutSet[] = setsRes.ok ? await setsRes.json() : [];
+      setSessions(withSets);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-            // Fetch media per exercise in parallel
-            const setsWithMedia: SetWithMedia[] = await Promise.all(
-              setsData.map(async (set) => {
-                const mRes = await fetch(`/api/workout-sets/${set.id}/media`, { headers });
-                const media: WorkoutSetMedia[] = mRes.ok ? await mRes.json() : [];
-                return { ...set, media };
-              }),
-            );
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-            return { ...s, sets: setsWithMedia };
-          }),
-        );
+  /** Optimistic inline update — saves to API and updates local state. */
+  const handleUpdate = useCallback(async (setId: string, field: string, raw: string) => {
+    // Build the body
+    const body: Record<string, unknown> = {};
+    if (field === 'series') body.series = raw ? Number(raw) : 1;
+    else if (field === 'weight') body.weight = raw ? Number(raw) : null;
+    else if (field === 'reps') body.reps = raw.trim() || null;
+    else return;
 
-        setSessions(withSets);
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    // Optimistic local update
+    setSessions((prev) =>
+      prev.map((s) => ({
+        ...s,
+        sets: s.sets.map((ex) =>
+          ex.id === setId ? { ...ex, [field]: body[field] } : ex,
+        ),
+      })),
+    );
+
+    // Save to API
+    setSavingIds((prev) => new Set(prev).add(setId));
+    try {
+      await fetch(`/api/workout-sets/${setId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(body),
+      });
+    } catch { /* silently fail — could add toast */ }
+    setSavingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(setId);
+      return next;
+    });
   }, []);
 
   return (
@@ -183,7 +335,13 @@ export default function WorkoutsPage() {
       ) : (
         <div className="space-y-5">
           {sessions.map((session) => (
-            <SessionCard key={session.id} session={session} locale={locale} />
+            <SessionCard
+              key={session.id}
+              session={session}
+              locale={locale}
+              onUpdate={handleUpdate}
+              savingIds={savingIds}
+            />
           ))}
         </div>
       )}

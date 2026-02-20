@@ -136,6 +136,10 @@ export const translations = {
       rights: '© {year} TrackBase. Всички права запазени.',
     },
   },
-} as const;
+};
 
-export type Translations = typeof translations['en'];
+type DeepStringRecord<T> = {
+  [K in keyof T]: T[K] extends string ? string : DeepStringRecord<T[K]>;
+};
+
+export type Translations = DeepStringRecord<typeof translations['en']>;

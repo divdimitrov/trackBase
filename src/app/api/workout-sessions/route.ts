@@ -1,44 +1,35 @@
 import { supabaseServer } from '@/lib/supabase/server';
-import { requireApiKey } from '@/lib/api/requireApiKey';
-import { jsonOk, jsonError, parseJson } from '@/lib/api/http';
+import { withAuth } from '@/lib/api/requireApiKey';
+import { jsonOk, jsonError, parseJson, pickFields, parsePagination } from '@/lib/api/http';
 
-export async function GET(req: Request) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const GET = withAuth(async (req) => {
+  const { limit, offset } = parsePagination(req);
   const supabase = supabaseServer();
 
   // Try ordering by session_date first, fall back to created_at
   let result = await supabase
     .from('workout_sessions')
     .select('*')
-    .order('session_date', { ascending: false });
+    .order('session_date', { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (result.error?.message?.includes('session_date')) {
     result = await supabase
       .from('workout_sessions')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
   }
 
-  if (result.error) return jsonError(result.error.message, 500);
+  if (result.error) return jsonError(result.error.message, 500, result.error.details);
   return jsonOk(result.data);
-}
+});
 
-export async function POST(req: Request) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
-  const [body, err] = await parseJson<Record<string, unknown>>(req);
+export const POST = withAuth(async (req) => {
+  const [body, err] = await parseJson(req);
   if (err) return err;
 
-  // Build insert payload from known possible columns
-  const row: Record<string, unknown> = {};
-  if (body!.title !== undefined) row.title = body!.title;
-  if (body!.name !== undefined) row.name = body!.name;
-  if (body!.notes !== undefined) row.notes = body!.notes;
-  if (body!.session_date !== undefined) row.session_date = body!.session_date;
-
+  const [row, hasFields] = pickFields(body, ['title', 'name', 'notes', 'session_date']);
   if (!row.title && !row.name) {
     return jsonError('title or name is required');
   }
@@ -52,4 +43,4 @@ export async function POST(req: Request) {
 
   if (error) return jsonError(error.message, 500, error.details);
   return jsonOk(data, 201);
-}
+});

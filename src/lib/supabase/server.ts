@@ -1,10 +1,16 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-export function supabaseServer() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error('Missing Supabase environment variables');
+let _client: SupabaseClient | null = null;
+
+/** Returns a singleton Supabase client using the service-role key (server-only). */
+export function supabaseServer(): SupabaseClient {
+  if (!_client) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    _client = createClient(url, key);
   }
-  return createClient(url, key);
+  return _client;
 }

@@ -1,36 +1,33 @@
 import { supabaseServer } from '@/lib/supabase/server';
-import { requireApiKey } from '@/lib/api/requireApiKey';
-import { jsonOk, jsonError, parseJson } from '@/lib/api/http';
+import { withAuth } from '@/lib/api/requireApiKey';
+import { jsonOk, jsonError, parseJson, parsePagination } from '@/lib/api/http';
 
-export async function GET(req: Request) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const GET = withAuth(async (req) => {
+  const { limit, offset } = parsePagination(req);
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('recipes')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 
-  if (error) return jsonError(error.message, 500);
+  if (error) return jsonError(error.message, 500, error.details);
   return jsonOk(data);
-}
+});
 
-export async function POST(req: Request) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const POST = withAuth(async (req) => {
   const [body, err] = await parseJson<{ title?: string; notes?: string }>(req);
   if (err) return err;
-  if (!body!.title) return jsonError('title is required');
+
+  if (!body.title) return jsonError('title is required');
 
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('recipes')
-    .insert({ title: body!.title, notes: body!.notes ?? null })
+    .insert({ title: body.title, notes: body.notes ?? null })
     .select()
     .single();
 
-  if (error) return jsonError(error.message, 500);
+  if (error) return jsonError(error.message, 500, error.details);
   return jsonOk(data, 201);
-}
+});

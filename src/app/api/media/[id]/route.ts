@@ -1,14 +1,15 @@
 import { supabaseServer } from '@/lib/supabase/server';
-import { requireApiKey } from '@/lib/api/requireApiKey';
-import { jsonOk, jsonError, parseJson } from '@/lib/api/http';
+import { withAuth } from '@/lib/api/requireApiKey';
+import {
+  jsonOk, jsonError, parseJson, validateUuid,
+  notFoundOr500, pickFields, type RouteCtx,
+} from '@/lib/api/http';
 
-type Ctx = { params: Promise<{ id: string }> };
-
-export async function GET(req: Request, ctx: Ctx) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const GET = withAuth(async (_req, ctx: RouteCtx) => {
   const { id } = await ctx.params;
+  const bad = validateUuid(id);
+  if (bad) return bad;
+
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('media')
@@ -16,32 +17,20 @@ export async function GET(req: Request, ctx: Ctx) {
     .eq('id', id)
     .single();
 
-  if (error) {
-    if (error.code === 'PGRST116') return jsonError('Media not found', 404);
-    return jsonError(error.message, 500);
-  }
+  if (error) return notFoundOr500(error, 'Media');
   return jsonOk(data);
-}
+});
 
-export async function PUT(req: Request, ctx: Ctx) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const PUT = withAuth(async (req, ctx: RouteCtx) => {
   const { id } = await ctx.params;
-  const [body, err] = await parseJson<{
-    url?: string;
-    type?: string;
-    title?: string;
-    notes?: string;
-  }>(req);
+  const bad = validateUuid(id);
+  if (bad) return bad;
+
+  const [body, err] = await parseJson(req);
   if (err) return err;
 
-  const updates: Record<string, unknown> = {};
-  if (body!.url !== undefined) updates.url = body!.url;
-  if (body!.type !== undefined) updates.type = body!.type;
-  if (body!.title !== undefined) updates.title = body!.title;
-  if (body!.notes !== undefined) updates.notes = body!.notes;
-  if (Object.keys(updates).length === 0) return jsonError('No fields to update');
+  const [updates, hasFields] = pickFields(body, ['url', 'type', 'title', 'notes']);
+  if (!hasFields) return jsonError('No fields to update');
 
   const supabase = supabaseServer();
   const { data, error } = await supabase
@@ -51,21 +40,18 @@ export async function PUT(req: Request, ctx: Ctx) {
     .select()
     .single();
 
-  if (error) {
-    if (error.code === 'PGRST116') return jsonError('Media not found', 404);
-    return jsonError(error.message, 500);
-  }
+  if (error) return notFoundOr500(error, 'Media');
   return jsonOk(data);
-}
+});
 
-export async function DELETE(req: Request, ctx: Ctx) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const DELETE = withAuth(async (_req, ctx: RouteCtx) => {
   const { id } = await ctx.params;
+  const bad = validateUuid(id);
+  if (bad) return bad;
+
   const supabase = supabaseServer();
   const { error } = await supabase.from('media').delete().eq('id', id);
 
-  if (error) return jsonError(error.message, 500);
+  if (error) return jsonError(error.message, 500, error.details);
   return jsonOk({ deleted: true });
-}
+});

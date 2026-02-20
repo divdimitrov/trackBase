@@ -1,14 +1,12 @@
 import { supabaseServer } from '@/lib/supabase/server';
-import { requireApiKey } from '@/lib/api/requireApiKey';
-import { jsonOk, jsonError, parseJson } from '@/lib/api/http';
+import { withAuth } from '@/lib/api/requireApiKey';
+import { jsonOk, jsonError, parseJson, validateUuid, pickFields, type RouteCtx } from '@/lib/api/http';
 
-type Ctx = { params: Promise<{ id: string }> };
-
-export async function GET(req: Request, ctx: Ctx) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const GET = withAuth(async (_req, ctx: RouteCtx) => {
   const { id: sessionId } = await ctx.params;
+  const bad = validateUuid(sessionId);
+  if (bad) return bad;
+
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('workout_sets')
@@ -16,30 +14,24 @@ export async function GET(req: Request, ctx: Ctx) {
     .eq('session_id', sessionId)
     .order('created_at', { ascending: true });
 
-  if (error) return jsonError(error.message, 500);
+  if (error) return jsonError(error.message, 500, error.details);
   return jsonOk(data);
-}
+});
 
-export async function POST(req: Request, ctx: Ctx) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const POST = withAuth(async (req, ctx: RouteCtx) => {
   const { id: sessionId } = await ctx.params;
-  const [body, err] = await parseJson<Record<string, unknown>>(req);
+  const bad = validateUuid(sessionId);
+  if (bad) return bad;
+
+  const [body, err] = await parseJson(req);
   if (err) return err;
 
-  const row: Record<string, unknown> = { session_id: sessionId };
-  // Accept common possible column names
-  if (body!.exercise !== undefined) row.exercise = body!.exercise;
-  if (body!.name !== undefined) row.name = body!.name;
-  if (body!.reps !== undefined) row.reps = body!.reps;
-  if (body!.weight !== undefined) row.weight = body!.weight;
-  if (body!.notes !== undefined) row.notes = body!.notes;
-
-  if (!row.exercise && !row.name) {
+  const [fields] = pickFields(body, ['exercise', 'name', 'reps', 'weight', 'notes']);
+  if (!fields.exercise && !fields.name) {
     return jsonError('exercise or name is required');
   }
 
+  const row = { session_id: sessionId, ...fields };
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('workout_sets')
@@ -49,4 +41,4 @@ export async function POST(req: Request, ctx: Ctx) {
 
   if (error) return jsonError(error.message, 500, error.details);
   return jsonOk(data, 201);
-}
+});

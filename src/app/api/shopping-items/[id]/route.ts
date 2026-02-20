@@ -1,26 +1,20 @@
 import { supabaseServer } from '@/lib/supabase/server';
-import { requireApiKey } from '@/lib/api/requireApiKey';
-import { jsonOk, jsonError, parseJson } from '@/lib/api/http';
+import { withAuth } from '@/lib/api/requireApiKey';
+import {
+  jsonOk, jsonError, parseJson, validateUuid,
+  notFoundOr500, pickFields, type RouteCtx,
+} from '@/lib/api/http';
 
-type Ctx = { params: Promise<{ id: string }> };
-
-export async function PUT(req: Request, ctx: Ctx) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const PUT = withAuth(async (req, ctx: RouteCtx) => {
   const { id } = await ctx.params;
-  const [body, err] = await parseJson<{
-    name?: string;
-    qty_text?: string;
-    is_checked?: boolean;
-  }>(req);
+  const bad = validateUuid(id);
+  if (bad) return bad;
+
+  const [body, err] = await parseJson(req);
   if (err) return err;
 
-  const updates: Record<string, unknown> = {};
-  if (body!.name !== undefined) updates.name = body!.name;
-  if (body!.qty_text !== undefined) updates.qty_text = body!.qty_text;
-  if (body!.is_checked !== undefined) updates.is_checked = body!.is_checked;
-  if (Object.keys(updates).length === 0) return jsonError('No fields to update');
+  const [updates, hasFields] = pickFields(body, ['name', 'qty_text', 'is_checked']);
+  if (!hasFields) return jsonError('No fields to update');
 
   const supabase = supabaseServer();
   const { data, error } = await supabase
@@ -30,24 +24,21 @@ export async function PUT(req: Request, ctx: Ctx) {
     .select()
     .single();
 
-  if (error) {
-    if (error.code === 'PGRST116') return jsonError('Shopping item not found', 404);
-    return jsonError(error.message, 500);
-  }
+  if (error) return notFoundOr500(error, 'Shopping item');
   return jsonOk(data);
-}
+});
 
-export async function DELETE(req: Request, ctx: Ctx) {
-  const denied = requireApiKey(req);
-  if (denied) return denied;
-
+export const DELETE = withAuth(async (_req, ctx: RouteCtx) => {
   const { id } = await ctx.params;
+  const bad = validateUuid(id);
+  if (bad) return bad;
+
   const supabase = supabaseServer();
   const { error } = await supabase
     .from('shopping_items')
     .delete()
     .eq('id', id);
 
-  if (error) return jsonError(error.message, 500);
+  if (error) return jsonError(error.message, 500, error.details);
   return jsonOk({ deleted: true });
-}
+});

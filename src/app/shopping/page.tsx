@@ -1,15 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { mockShoppingItems } from '@/lib/mockData';
-import { ShoppingItem } from '@/lib/types';
+import { mockShoppingItems, type MockShoppingItem } from '@/lib/mockData';
 import { useLanguage } from '@/components/LanguageProvider';
 
 function ShoppingItemRow({
   item,
   onToggle,
 }: {
-  item: ShoppingItem;
+  item: MockShoppingItem;
   onToggle: (id: string) => void;
 }) {
   return (
@@ -51,7 +50,7 @@ function ShoppingItemRow({
 }
 
 export default function ShoppingPage() {
-  const [items, setItems] = useState<ShoppingItem[]>(mockShoppingItems);
+  const [items, setItems] = useState<MockShoppingItem[]>(mockShoppingItems);
 
   const handleToggle = (id: string) => {
     setItems((prev) =>
@@ -70,7 +69,7 @@ export default function ShoppingPage() {
     if (!acc[category]) acc[category] = [];
     acc[category].push(item);
     return acc;
-  }, {} as Record<string, ShoppingItem[]>);
+  }, {} as Record<string, MockShoppingItem[]>);
 
   const { t } = useLanguage();
 

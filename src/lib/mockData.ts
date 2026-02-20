@@ -1,22 +1,51 @@
-import { Recipe, Workout, ShoppingItem, Media } from './types';
+// ---------------------------------------------------------------------------
+// Mock types (legacy shape for public pages — will be replaced in Phase 2)
+// ---------------------------------------------------------------------------
 
-export const mockMedia: Media[] = [
-  {
-    type: 'image',
-    imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
-  },
-  {
-    type: 'image',
-    imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
-  },
-  {
-    type: 'video',
-    videoUrl: 'https://example.com/workout-demo.mp4',
-    imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400',
-  },
-];
+export interface MockMedia {
+  type: 'image' | 'video';
+  imageUrl?: string;
+  videoUrl?: string;
+}
 
-export const mockRecipes: Recipe[] = [
+export interface MockRecipe {
+  id: string;
+  title: string;
+  notes?: string;
+  ingredients: string[];
+  media?: MockMedia;
+}
+
+export interface MockWorkoutSet {
+  reps: number;
+  weight?: number;
+  notes?: string;
+}
+
+export interface MockExercise {
+  name: string;
+  sets: MockWorkoutSet[];
+}
+
+export interface MockWorkout {
+  id: string;
+  date: string;
+  title: string;
+  exercises: MockExercise[];
+}
+
+export interface MockShoppingItem {
+  id: string;
+  name: string;
+  checked: boolean;
+  category?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Mock data
+// ---------------------------------------------------------------------------
+
+export const mockRecipes: MockRecipe[] = [
   {
     id: '1',
     title: 'Overnight Oats',
@@ -85,7 +114,7 @@ export const mockRecipes: Recipe[] = [
   },
 ];
 
-export const mockWorkouts: Workout[] = [
+export const mockWorkouts: MockWorkout[] = [
   {
     id: '1',
     date: '2026-02-20',
@@ -183,7 +212,7 @@ export const mockWorkouts: Workout[] = [
   },
 ];
 
-export const mockShoppingItems: ShoppingItem[] = [
+export const mockShoppingItems: MockShoppingItem[] = [
   { id: '1', name: 'Chicken breast (2 lbs)', checked: false, category: 'Protein' },
   { id: '2', name: 'Salmon fillets', checked: false, category: 'Protein' },
   { id: '3', name: 'Greek yogurt', checked: true, category: 'Dairy' },

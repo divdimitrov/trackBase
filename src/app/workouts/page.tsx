@@ -1,10 +1,9 @@
 'use client';
 
-import { mockWorkouts } from '@/lib/mockData';
-import { Workout, Exercise } from '@/lib/types';
+import { mockWorkouts, type MockWorkout, type MockExercise } from '@/lib/mockData';
 import { useLanguage } from '@/components/LanguageProvider';
 
-function ExerciseGroup({ exercise, repsLabel }: { exercise: Exercise; repsLabel: string }) {
+function ExerciseGroup({ exercise, repsLabel }: { exercise: MockExercise; repsLabel: string }) {
   return (
     <div className="space-y-2">
       <h4 className="text-sm font-semibold text-gray-800">{exercise.name}</h4>
@@ -29,7 +28,7 @@ function ExerciseGroup({ exercise, repsLabel }: { exercise: Exercise; repsLabel:
   );
 }
 
-function WorkoutCard({ workout, repsLabel, locale }: { workout: Workout; repsLabel: string; locale: string }) {
+function WorkoutCard({ workout, repsLabel, locale }: { workout: MockWorkout; repsLabel: string; locale: string }) {
   const formattedDate = new Date(workout.date).toLocaleDateString(locale === 'bg' ? 'bg-BG' : 'en-US', {
     weekday: 'short',
     month: 'short',

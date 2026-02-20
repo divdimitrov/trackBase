@@ -1,10 +1,9 @@
 'use client';
 
-import { mockRecipes } from '@/lib/mockData';
-import { Recipe } from '@/lib/types';
+import { mockRecipes, type MockRecipe } from '@/lib/mockData';
 import { useLanguage } from '@/components/LanguageProvider';
 
-function RecipeCard({ recipe, ingredientsLabel }: { recipe: Recipe; ingredientsLabel: string }) {
+function RecipeCard({ recipe, ingredientsLabel }: { recipe: MockRecipe; ingredientsLabel: string }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
       {recipe.media?.imageUrl && (

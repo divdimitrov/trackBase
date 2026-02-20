@@ -9,17 +9,40 @@ export default function AdminGate({ children }: { children: ReactNode }) {
   const { t } = useLanguage();
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (apiKey) return <>{children}</>;
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed) {
       setError(t.admin.gate.errorEmpty);
       return;
     }
-    setApiKey(trimmed);
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: trimmed }),
+      });
+      const json = await res.json();
+
+      if (!res.ok) {
+        setError(json.error ?? t.admin.gate.errorWrong);
+        return;
+      }
+
+      setApiKey(json.apiKey);
+    } catch {
+      setError(t.admin.gate.errorWrong);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,9 +77,10 @@ export default function AdminGate({ children }: { children: ReactNode }) {
 
         <button
           type="submit"
-          className="w-full py-2.5 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 active:bg-gray-700 transition-colors"
+          disabled={loading}
+          className="w-full py-2.5 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 active:bg-gray-700 disabled:opacity-50 transition-colors"
         >
-          {t.admin.gate.submit}
+          {loading ? '…' : t.admin.gate.submit}
         </button>
       </form>
     </div>

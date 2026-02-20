@@ -64,10 +64,11 @@ export const translations = {
       // Gate
       gate: {
         title: 'Admin Access',
-        subtitle: 'Enter your API key to continue',
-        placeholder: 'API key',
+        subtitle: 'Enter your admin password to continue',
+        placeholder: 'Password',
         submit: 'Unlock',
-        errorEmpty: 'Please enter an API key',
+        errorEmpty: 'Please enter a password',
+        errorWrong: 'Wrong password',
       },
       // Dashboard
       dashboard: {
@@ -226,10 +227,11 @@ export const translations = {
       // Gate
       gate: {
         title: 'Админ достъп',
-        subtitle: 'Въведете API ключа за да продължите',
-        placeholder: 'API ключ',
+        subtitle: 'Въведете админ паролата за да продължите',
+        placeholder: 'Парола',
         submit: 'Отключи',
-        errorEmpty: 'Моля въведете API ключ',
+        errorEmpty: 'Моля въведете парола',
+        errorWrong: 'Грешна парола',
       },
       // Dashboard
       dashboard: {

@@ -1,54 +1,57 @@
 'use client';
 
-import { mockRecipes, type MockRecipe } from '@/lib/mockData';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider';
+import type { DietDay, DietMeal, MealType } from '@/lib/types';
+import { MEAL_TYPES, mealTypeLabels } from '@/lib/types';
 
-function RecipeCard({ recipe, ingredientsLabel }: { recipe: MockRecipe; ingredientsLabel: string }) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-      {recipe.media?.imageUrl && (
-        <div className="aspect-video relative bg-gray-100">
-          <img
-            src={recipe.media.imageUrl}
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-          />
-          {recipe.media.type === 'video' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-      <div className="p-4 sm:p-5 space-y-3">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-900">{recipe.title}</h3>
-        
-        {recipe.notes && (
-          <p className="text-sm text-gray-500 leading-relaxed">{recipe.notes}</p>
-        )}
-        
-        <div>
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{ingredientsLabel}</h4>
-          <ul className="space-y-1.5">
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
-                <span className="text-gray-300 mt-0.5">•</span>
-                <span>{ingredient}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+/**
+ * Public diet page — shows the daily meal plan.
+ * Fetches from the API (requires stored API key from admin gate, or
+ * works when APP_API_KEY env is unset — dev convenience).
+ */
 export default function DietPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const [days, setDays] = useState<(DietDay & { meals: DietMeal[] })[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const apiKey = typeof window !== 'undefined' ? localStorage.getItem('tb_api_key') ?? '' : '';
+        const headers: HeadersInit = apiKey ? { 'x-api-key': apiKey } : {};
+
+        const daysRes = await fetch('/api/diet-days?limit=100', { headers });
+        if (!daysRes.ok) throw new Error('days');
+        const daysData: DietDay[] = await daysRes.json();
+
+        // Fetch meals per day in parallel
+        const withMeals = await Promise.all(
+          daysData.map(async (day) => {
+            const mRes = await fetch(`/api/diet-days/${day.id}/meals`, { headers });
+            const meals: DietMeal[] = mRes.ok ? await mRes.json() : [];
+            return { ...day, meals };
+          }),
+        );
+
+        setDays(withMeals);
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const mealLabel = (mt: MealType) => mealTypeLabels[mt][locale];
+
+  // Group meals by type for a day
+  const groupByType = (meals: DietMeal[]) => {
+    const map: Record<MealType, DietMeal[]> = { breakfast: [], lunch: [], dinner: [], snack: [] };
+    for (const m of meals) map[m.meal_type]?.push(m);
+    return map;
+  };
 
   return (
     <div className="space-y-6">
@@ -57,11 +60,69 @@ export default function DietPage() {
         <p className="text-sm text-gray-500">{t.diet.subtitle}</p>
       </div>
 
-      <div className="space-y-4">
-        {mockRecipes.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} ingredientsLabel={t.diet.ingredients} />
-        ))}
-      </div>
+      {loading && (
+        <div className="flex justify-center py-12">
+          <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+        </div>
+      )}
+
+      {!loading && error && (
+        <p className="text-sm text-red-500 text-center py-8">{t.diet.noData}</p>
+      )}
+
+      {!loading && !error && days.length === 0 && (
+        <p className="text-sm text-gray-400 text-center py-12">{t.diet.noData}</p>
+      )}
+
+      {days.map((day) => {
+        const grouped = groupByType(day.meals);
+        return (
+          <section
+            key={day.id}
+            className="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden"
+          >
+            {/* Day header */}
+            <div className="bg-gray-50 px-5 py-3 border-b border-gray-100">
+              <h2 className="text-base font-bold text-gray-900">{day.label}</h2>
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              {MEAL_TYPES.map((mt) => {
+                const meals = grouped[mt];
+                if (meals.length === 0) return null;
+                return (
+                  <div key={mt} className="px-5 py-4 space-y-3">
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      {mealLabel(mt)}
+                    </h3>
+                    {meals.map((meal) => (
+                      <div key={meal.id} className="space-y-1.5">
+                        <p className="text-sm font-medium text-gray-900">{meal.title}</p>
+                        {meal.ingredients && (
+                          <div>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                              {t.diet.ingredients}
+                            </span>
+                            <p className="text-sm text-gray-600 whitespace-pre-line mt-0.5">{meal.ingredients}</p>
+                          </div>
+                        )}
+                        {meal.instructions && (
+                          <div>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                              {t.diet.instructions}
+                            </span>
+                            <p className="text-sm text-gray-600 whitespace-pre-line mt-0.5">{meal.instructions}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

@@ -62,6 +62,37 @@ export interface WorkoutSet {
   created_at: string;
 }
 
+// --------------- Diet (daily meal plan) ------------------------------------
+
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+
+export const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
+
+export const mealTypeLabels: Record<MealType, { en: string; bg: string }> = {
+  breakfast: { en: 'Breakfast', bg: 'Закуска' },
+  lunch:     { en: 'Lunch',     bg: 'Обяд' },
+  dinner:    { en: 'Dinner',    bg: 'Вечеря' },
+  snack:     { en: 'Snack',     bg: 'Следвечерна закуска' },
+};
+
+export interface DietDay {
+  id: string;
+  label: string;           // e.g. "Понеделник" / "Monday"
+  sort_order: number;
+  created_at: string;
+}
+
+export interface DietMeal {
+  id: string;
+  day_id: string;
+  meal_type: MealType;
+  title: string;
+  ingredients: string | null;   // free-text list
+  instructions: string | null;  // cooking steps
+  sort_order: number;
+  created_at: string;
+}
+
 // ---------------------------------------------------------------------------
 // Convenience helpers
 // ---------------------------------------------------------------------------

@@ -5,6 +5,7 @@ export const translations = {
     // Nav
     nav: {
       diet: 'Diet',
+      recipes: 'Recipes',
       workouts: 'Workouts',
       shopping: 'Shopping',
     },
@@ -14,7 +15,9 @@ export const translations = {
       heroTitle: 'Your personal tracker',
       heroSubtitle: 'Diet, workouts, and shopping — all in one place.',
       dietTitle: 'Diet',
-      dietDesc: 'Track your recipes and meals',
+      dietDesc: 'Your daily meal plan',
+      recipesTitle: 'Recipes',
+      recipesDesc: 'Browse all saved recipes',
       workoutsTitle: 'Workouts',
       workoutsDesc: 'Log your exercise sessions',
       shoppingTitle: 'Shopping',
@@ -26,6 +29,15 @@ export const translations = {
     // Diet
     diet: {
       title: 'Diet',
+      subtitle: 'Your daily meal plan',
+      noData: 'No meal plan yet',
+      ingredients: 'Ingredients',
+      instructions: 'How to prepare',
+    },
+
+    // Recipes
+    recipes: {
+      title: 'Recipes',
       subtitle: 'Your saved recipes and meal ideas',
       ingredients: 'Ingredients',
     },
@@ -73,6 +85,7 @@ export const translations = {
       // Dashboard
       dashboard: {
         recipes: 'Recipes',
+        diet: 'Diet Plan',
         workouts: 'Workout Sessions',
         shopping: 'Shopping Items',
         media: 'Media',
@@ -156,6 +169,22 @@ export const translations = {
         mediaTitle: 'Title',
         mediaNotes: 'Notes',
       },
+      // Diet
+      diet: {
+        title: 'Diet Plan',
+        newDay: 'New Day',
+        editDay: 'Edit Day',
+        dayLabel: 'Day label (e.g. Monday)',
+        sortOrder: 'Sort order',
+        meals: 'Meals',
+        newMeal: 'New Meal',
+        editMeal: 'Edit Meal',
+        mealType: 'Meal type',
+        mealTitle: 'Title',
+        mealIngredients: 'Ingredients',
+        mealInstructions: 'Instructions',
+        noMeals: 'No meals yet',
+      },
     },
 
     // Footer
@@ -168,6 +197,7 @@ export const translations = {
     // Nav
     nav: {
       diet: 'Диета',
+      recipes: 'Рецепти',
       workouts: 'Тренировки',
       shopping: 'Пазаруване',
     },
@@ -177,7 +207,9 @@ export const translations = {
       heroTitle: 'Твоят личен тракер',
       heroSubtitle: 'Диета, тренировки и пазаруване — всичко на едно място.',
       dietTitle: 'Диета',
-      dietDesc: 'Следи рецептите и храненето си',
+      dietDesc: 'Твоят дневен хранителен план',
+      recipesTitle: 'Рецепти',
+      recipesDesc: 'Разгледай всички запазени рецепти',
       workoutsTitle: 'Тренировки',
       workoutsDesc: 'Записвай упражненията си',
       shoppingTitle: 'Пазаруване',
@@ -189,6 +221,15 @@ export const translations = {
     // Diet
     diet: {
       title: 'Диета',
+      subtitle: 'Твоят дневен хранителен план',
+      noData: 'Все още няма хранителен план',
+      ingredients: 'Съставки',
+      instructions: 'Как да приготвиш',
+    },
+
+    // Recipes
+    recipes: {
+      title: 'Рецепти',
       subtitle: 'Твоите запазени рецепти и идеи за хранене',
       ingredients: 'Съставки',
     },
@@ -236,6 +277,7 @@ export const translations = {
       // Dashboard
       dashboard: {
         recipes: 'Рецепти',
+        diet: 'Хранителен план',
         workouts: 'Тренировки',
         shopping: 'Пазаруване',
         media: 'Медия',
@@ -318,6 +360,22 @@ export const translations = {
         mediaType: 'Тип (видео / снимка)',
         mediaTitle: 'Заглавие',
         mediaNotes: 'Бележки',
+      },
+      // Diet
+      diet: {
+        title: 'Хранителен план',
+        newDay: 'Нов ден',
+        editDay: 'Редактирай ден',
+        dayLabel: 'Етикет (напр. Понеделник)',
+        sortOrder: 'Подредба',
+        meals: 'Хранения',
+        newMeal: 'Ново хранене',
+        editMeal: 'Редактирай хранене',
+        mealType: 'Тип хранене',
+        mealTitle: 'Заглавие',
+        mealIngredients: 'Съставки',
+        mealInstructions: 'Инструкции',
+        noMeals: 'Все още няма хранения',
       },
     },
 

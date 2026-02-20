@@ -13,6 +13,7 @@ function AdminNav() {
   const links = [
     { href: '/admin', label: t.admin.title, exact: true },
     { href: '/admin/recipes', label: t.admin.dashboard.recipes },
+    { href: '/admin/diet', label: t.admin.dashboard.diet },
     { href: '/admin/workouts', label: t.admin.dashboard.workouts },
     { href: '/admin/shopping', label: t.admin.dashboard.shopping },
     { href: '/admin/media', label: t.admin.dashboard.media },

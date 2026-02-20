@@ -7,7 +7,8 @@ export default function Home() {
   const { t } = useLanguage();
 
   const sections = [
-    { href: '/diet', title: t.home.dietTitle, description: t.home.dietDesc, emoji: '🥗' },
+    { href: '/diet', title: t.home.dietTitle, description: t.home.dietDesc, emoji: '📅' },
+    { href: '/recipes', title: t.home.recipesTitle, description: t.home.recipesDesc, emoji: '🥗' },
     { href: '/workouts', title: t.home.workoutsTitle, description: t.home.workoutsDesc, emoji: '💪' },
     { href: '/shopping', title: t.home.shoppingTitle, description: t.home.shoppingDesc, emoji: '🛒' },
     { href: '/admin', title: t.home.adminTitle, description: t.home.adminDesc, emoji: '⚙️' },

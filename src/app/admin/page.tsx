@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/admin/LoadingSpinner';
 
 interface Counts {
   recipes: number | null;
+  diet: number | null;
   workouts: number | null;
   shopping: number | null;
   media: number | null;
@@ -19,6 +20,7 @@ export default function AdminDashboard() {
   const { apiKey, logout } = useAuth();
   const [counts, setCounts] = useState<Counts>({
     recipes: null,
+    diet: null,
     workouts: null,
     shopping: null,
     media: null,
@@ -28,14 +30,16 @@ export default function AdminDashboard() {
   const load = useCallback(async () => {
     if (!apiKey) return;
     setLoading(true);
-    const [r, w, s, m] = await Promise.all([
+    const [r, d, w, s, m] = await Promise.all([
       apiGet<unknown[]>('/api/recipes?limit=1000', apiKey),
+      apiGet<unknown[]>('/api/diet-days?limit=100', apiKey),
       apiGet<unknown[]>('/api/workout-sessions?limit=1000', apiKey),
       apiGet<unknown[]>('/api/shopping-items?limit=1000', apiKey),
       apiGet<unknown[]>('/api/media?limit=1000', apiKey),
     ]);
     setCounts({
       recipes: r.data?.length ?? 0,
+      diet: d.data?.length ?? 0,
       workouts: w.data?.length ?? 0,
       shopping: s.data?.length ?? 0,
       media: m.data?.length ?? 0,
@@ -47,6 +51,7 @@ export default function AdminDashboard() {
 
   const cards = [
     { href: '/admin/recipes', label: t.admin.dashboard.recipes, count: counts.recipes, icon: '📝' },
+    { href: '/admin/diet', label: t.admin.dashboard.diet, count: counts.diet, icon: '📅' },
     { href: '/admin/workouts', label: t.admin.dashboard.workouts, count: counts.workouts, icon: '🏋️' },
     { href: '/admin/shopping', label: t.admin.dashboard.shopping, count: counts.shopping, icon: '🛒' },
     { href: '/admin/media', label: t.admin.dashboard.media, count: counts.media, icon: '🎬' },

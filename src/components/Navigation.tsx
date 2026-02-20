@@ -13,6 +13,7 @@ export default function Navigation() {
 
   const navItems = [
     { href: '/diet', label: t.nav.diet },
+    { href: '/recipes', label: t.nav.recipes },
     { href: '/workouts', label: t.nav.workouts },
     { href: '/shopping', label: t.nav.shopping },
   ];

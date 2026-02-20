@@ -19,7 +19,7 @@ export default function DietPage() {
   useEffect(() => {
     (async () => {
       try {
-        const apiKey = typeof window !== 'undefined' ? localStorage.getItem('tb_api_key') ?? '' : '';
+        const apiKey = typeof window !== 'undefined' ? localStorage.getItem('trackbase_api_key') ?? '' : '';
         const headers: HeadersInit = apiKey ? { 'x-api-key': apiKey } : {};
 
         const daysRes = await fetch('/api/diet-days?limit=100', { headers });

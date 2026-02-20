@@ -13,7 +13,7 @@ export const PUT = withAuth(async (req, ctx: RouteCtx) => {
   const [body, err] = await parseJson(req);
   if (err) return err;
 
-  const [updates, hasFields] = pickFields(body, ['exercise', 'name', 'reps', 'weight', 'notes']);
+  const [updates, hasFields] = pickFields(body, ['exercise', 'set_no', 'series', 'reps', 'weight', 'notes']);
   if (!hasFields) return jsonError('No fields to update');
 
   const supabase = supabaseServer();

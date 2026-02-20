@@ -44,22 +44,32 @@ export interface ShoppingItem {
 
 export interface WorkoutSession {
   id: string;
-  title?: string | null;
-  name?: string | null;
+  owner_id?: string | null;
+  title: string;
   notes: string | null;
-  session_date?: string | null;
+  workout_date: string;       // DATE (NOT NULL in DB)
   created_at: string;
+  updated_at?: string;
 }
 
 export interface WorkoutSet {
   id: string;
   session_id: string;
-  exercise?: string | null;
-  name?: string | null;
-  reps: number | null;
+  exercise: string;            // NOT NULL in DB
+  set_no: number;              // sort order / set number
+  series: number;              // how many series (default 1)
+  reps: string | null;         // text to support ranges like "8-12"
   weight: number | null;
   notes: string | null;
-  created_at: string;
+}
+
+/** Junction row: media linked to a workout exercise */
+export interface WorkoutSetMedia {
+  id: string;
+  set_id: string;
+  media_id: string;
+  sort_order: number;
+  media?: MediaItem | null;
 }
 
 // --------------- Diet (daily meal plan) ------------------------------------
@@ -97,12 +107,7 @@ export interface DietMeal {
 // Convenience helpers
 // ---------------------------------------------------------------------------
 
-/** Display name for a workout session (title || name || date || "Untitled"). */
+/** Display name for a workout session. */
 export function sessionLabel(s: WorkoutSession): string {
-  return s.title || s.name || s.session_date || 'Untitled session';
-}
-
-/** Display name for a workout set exercise (exercise || name || "—"). */
-export function setExercise(s: WorkoutSet): string {
-  return s.exercise || s.name || '—';
+  return s.title || s.workout_date || 'Untitled session';
 }

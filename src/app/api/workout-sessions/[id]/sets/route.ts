@@ -12,7 +12,7 @@ export const GET = withAuth(async (_req, ctx: RouteCtx) => {
     .from('workout_sets')
     .select('*')
     .eq('session_id', sessionId)
-    .order('created_at', { ascending: true });
+    .order('set_no', { ascending: true });
 
   if (error) return jsonError(error.message, 500, error.details);
   return jsonOk(data);
@@ -26,10 +26,12 @@ export const POST = withAuth(async (req, ctx: RouteCtx) => {
   const [body, err] = await parseJson(req);
   if (err) return err;
 
-  const [fields] = pickFields(body, ['exercise', 'name', 'reps', 'weight', 'notes']);
-  if (!fields.exercise && !fields.name) {
-    return jsonError('exercise or name is required');
+  const [fields] = pickFields(body, ['exercise', 'set_no', 'series', 'reps', 'weight', 'notes']);
+  if (!fields.exercise) {
+    return jsonError('exercise is required');
   }
+  if (!fields.set_no) fields.set_no = 1;
+  if (!fields.series) fields.series = 1;
 
   const row = { session_id: sessionId, ...fields };
   const supabase = supabaseServer();

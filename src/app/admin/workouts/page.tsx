@@ -54,8 +54,8 @@ export default function WorkoutsAdmin() {
 
   const openEdit = (s: WorkoutSession) => {
     setEditing(s);
-    setFormTitle(s.title || s.name || '');
-    setFormDate(s.session_date?.slice(0, 10) ?? '');
+    setFormTitle(s.title ?? '');
+    setFormDate(s.workout_date?.slice(0, 10) ?? '');
     setFormNotes(s.notes ?? '');
     setModalOpen(true);
   };
@@ -65,7 +65,7 @@ export default function WorkoutsAdmin() {
     setSaving(true);
     const body: Record<string, unknown> = {};
     if (formTitle.trim()) body.title = formTitle.trim();
-    if (formDate) body.session_date = formDate;
+    if (formDate) body.workout_date = formDate;
     if (formNotes.trim()) body.notes = formNotes.trim();
 
     if (editing) {
@@ -95,9 +95,9 @@ export default function WorkoutsAdmin() {
   const columns: Column<WorkoutSession>[] = [
     { key: 'title', header: t.admin.workouts.sessionTitle, render: (s) => sessionLabel(s) },
     {
-      key: 'session_date',
+      key: 'workout_date',
       header: t.admin.workouts.sessionDate,
-      render: (s) => s.session_date ? new Date(s.session_date).toLocaleDateString() : '—',
+      render: (s) => s.workout_date ? new Date(s.workout_date + 'T00:00:00').toLocaleDateString() : '—',
     },
     {
       key: 'notes',

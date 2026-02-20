@@ -24,16 +24,16 @@ export default function Navigation() {
             <Image
               src="/trackbase-logo.png"
               alt="TrackBase logo"
-              width={32}
-              height={32}
+              width={40}
+              height={40}
               priority
               className="rounded-md"
             />
-            <span className="text-lg sm:text-xl font-semibold tracking-tight">TrackBase</span>
+            <span className="text-xl font-semibold tracking-tight">TrackBase</span>
           </Link>
 
           {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center gap-2">
+          <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}

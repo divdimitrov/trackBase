@@ -31,10 +31,10 @@ export default function Home() {
   return (
     <div className="space-y-6">
       <div className="text-center py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-xl font-semibold text-gray-900 mb-1">
           Welcome to TrackBase
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm text-gray-500">
           Your personal tracker for diet, workouts, and shopping
         </p>
       </div>

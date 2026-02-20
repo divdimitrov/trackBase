@@ -54,8 +54,8 @@ export default function WorkoutsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Workouts</h1>
-        <p className="text-gray-600">Your exercise log and history</p>
+        <h1 className="text-xl font-semibold text-gray-900 mb-1">Workouts</h1>
+        <p className="text-sm text-gray-500">Your exercise log and history</p>
       </div>
 
       <div className="space-y-4">

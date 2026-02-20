@@ -23,15 +23,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const year = new Date().getFullYear();
+
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen flex flex-col`}
       >
         <Navigation />
-        <main className="max-w-4xl mx-auto px-4 py-6">
+        <main className="w-full max-w-5xl mx-auto px-4 py-6 flex-1">
           {children}
         </main>
+        <footer className="border-t border-gray-200 bg-white">
+          <div className="w-full max-w-5xl mx-auto px-4 py-4 text-sm text-gray-500 flex items-center justify-between">
+            <span>© {year} TrackBase</span>
+            <span>v0.1.0</span>
+          </div>
+        </footer>
       </body>
     </html>
   );
